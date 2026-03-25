@@ -30,10 +30,6 @@ export default function ProfileScreen() {
     setProfile(p);
   };
 
-  const handleSettingPress = (setting: string) => {
-    Alert.alert('Coming Soon', `${setting} will be available in a future update.`);
-  };
-
   const handleLogout = () => {
     Alert.alert('Reset App', 'This will clear all data and take you back to setup.', [
       { text: 'Cancel', style: 'cancel' },
@@ -83,25 +79,25 @@ export default function ProfileScreen() {
         <Text style={styles.sectionTitle}>Settings</Text>
 
         <View style={styles.settingsGroup}>
-          <TouchableOpacity style={styles.settingRow} onPress={() => handleSettingPress('Edit Profile')}>
+          <TouchableOpacity style={styles.settingRow} onPress={() => navigation.navigate('EditProfile')}>
             <Text style={styles.settingText}>Edit Profile</Text>
             <Text style={styles.settingArrow}>{'\u203A'}</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.settingRow} onPress={() => handleSettingPress('Notifications')}>
+          <TouchableOpacity style={styles.settingRow} onPress={() => navigation.navigate('NotificationSettings')}>
             <Text style={styles.settingText}>Notifications</Text>
             <Text style={styles.settingArrow}>{'\u203A'}</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.settingRow} onPress={() => handleSettingPress('Payment Methods')}>
+          <TouchableOpacity style={styles.settingRow} onPress={() => Alert.alert('Coming Soon', 'Payment Methods will be available in a future update.')}>
             <Text style={styles.settingText}>Payment Methods</Text>
             <Text style={styles.settingArrow}>{'\u203A'}</Text>
           </TouchableOpacity>
           {isHost && (
-            <TouchableOpacity style={styles.settingRow} onPress={() => handleSettingPress('Payout Settings')}>
+            <TouchableOpacity style={styles.settingRow} onPress={() => Alert.alert('Coming Soon', 'Payout Settings will be available in a future update.')}>
               <Text style={styles.settingText}>Payout Settings</Text>
               <Text style={styles.settingArrow}>{'\u203A'}</Text>
             </TouchableOpacity>
           )}
-          <TouchableOpacity style={styles.settingRow} onPress={() => handleSettingPress('Help & Support')}>
+          <TouchableOpacity style={styles.settingRow} onPress={() => navigation.navigate('HelpSupport')}>
             <Text style={styles.settingText}>Help & Support</Text>
             <Text style={styles.settingArrow}>{'\u203A'}</Text>
           </TouchableOpacity>

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import {
   View,
   Text,
@@ -10,19 +10,38 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Colors, Spacing, Radius, Font } from '../constants/theme';
 import { MOCK_HOSTS, WORKOUT_TYPES } from '../constants/mockData';
+import { getFavorites, toggleFavorite } from '../services/storageService';
 import { RootStackParamList } from '../types';
 import HostCard from '../components/HostCard';
 
-const FILTER_OPTIONS = ['All', ...WORKOUT_TYPES.slice(0, 6)];
+const FILTER_OPTIONS = ['All', 'Favorites', ...WORKOUT_TYPES.slice(0, 6)];
 
 export default function BrowseScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const insets = useSafeAreaInsets();
   const [search, setSearch] = useState('');
   const [activeFilter, setActiveFilter] = useState('All');
+  const [favorites, setFavorites] = useState<string[]>([]);
+
+  useFocusEffect(
+    useCallback(() => {
+      loadFavorites();
+    }, []),
+  );
+
+  const loadFavorites = async () => {
+    const favs = await getFavorites();
+    setFavorites(favs);
+  };
+
+  const handleToggleFavorite = async (hostId: string) => {
+    const updated = await toggleFavorite(hostId);
+    setFavorites(updated);
+  };
 
   const filtered = useMemo(() => {
     let hosts = MOCK_HOSTS;
@@ -35,11 +54,13 @@ export default function BrowseScreen() {
           h.gym.name.toLowerCase().includes(q),
       );
     }
-    if (activeFilter !== 'All') {
+    if (activeFilter === 'Favorites') {
+      hosts = hosts.filter((h) => favorites.includes(h.id));
+    } else if (activeFilter !== 'All') {
       hosts = hosts.filter((h) => h.workoutType === activeFilter);
     }
     return hosts;
-  }, [search, activeFilter]);
+  }, [search, activeFilter, favorites]);
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
@@ -66,7 +87,7 @@ export default function BrowseScreen() {
             onPress={() => setActiveFilter(opt)}
           >
             <Text style={[styles.filterText, activeFilter === opt && styles.filterTextActive]}>
-              {opt}
+              {opt === 'Favorites' ? `${'\u2665'} Saved` : opt}
             </Text>
           </TouchableOpacity>
         ))}
@@ -78,6 +99,8 @@ export default function BrowseScreen() {
         renderItem={({ item }) => (
           <HostCard
             host={item}
+            isFavorite={favorites.includes(item.id)}
+            onFavoriteToggle={() => handleToggleFavorite(item.id)}
             onPress={() => navigation.navigate('HostProfile', { hostId: item.id })}
           />
         )}
@@ -85,7 +108,11 @@ export default function BrowseScreen() {
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={
           <View style={styles.empty}>
-            <Text style={styles.emptyText}>No hosts match your search</Text>
+            <Text style={styles.emptyText}>
+              {activeFilter === 'Favorites'
+                ? 'No saved hosts yet. Tap the heart on a host card to save them!'
+                : 'No hosts match your search'}
+            </Text>
           </View>
         }
       />
@@ -152,9 +179,11 @@ const styles = StyleSheet.create({
   empty: {
     paddingTop: 60,
     alignItems: 'center',
+    paddingHorizontal: Spacing.lg,
   },
   emptyText: {
     fontSize: Font.md,
     color: Colors.textMuted,
+    textAlign: 'center',
   },
 });

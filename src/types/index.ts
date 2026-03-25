@@ -63,11 +63,25 @@ export interface UserProfile {
   createdAt: string;
 }
 
-export type MainTabParamList = {
+export interface NotificationSettings {
+  sessionReminders: boolean;
+  bookingConfirmations: boolean;
+  promotions: boolean;
+  newHosts: boolean;
+}
+
+export const DEFAULT_NOTIFICATION_SETTINGS: NotificationSettings = {
+  sessionReminders: true,
+  bookingConfirmations: true,
+  promotions: false,
+  newHosts: true,
+};
+
+export interface MainTabParamList {
   Browse: undefined;
   Sessions: undefined;
   Profile: undefined;
-};
+}
 
 export type RootStackParamList = {
   Welcome: undefined;
@@ -75,4 +89,8 @@ export type RootStackParamList = {
   ProfileSetup: { role: 'client' | 'host' };
   MainTabs: { screen?: keyof MainTabParamList } | undefined;
   HostProfile: { hostId: string };
+  EditProfile: undefined;
+  NotificationSettings: undefined;
+  HelpSupport: undefined;
+  LeaveReview: { hostId: string; bookingId: string };
 };

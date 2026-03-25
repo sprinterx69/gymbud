@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert, RefreshControl } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -14,6 +14,7 @@ export default function SessionsScreen() {
   const insets = useSafeAreaInsets();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [tab, setTab] = useState<'upcoming' | 'past'>('upcoming');
+  const [refreshing, setRefreshing] = useState(false);
 
   useFocusEffect(
     useCallback(() => {
@@ -23,10 +24,15 @@ export default function SessionsScreen() {
 
   const loadBookings = async () => {
     const saved = await getBookings();
-    // Merge saved bookings with demo data, avoiding duplicates by id
     const savedIds = new Set(saved.map((b) => b.id));
     const demo = MOCK_BOOKINGS.filter((b) => !savedIds.has(b.id));
     setBookings([...saved, ...demo]);
+  };
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await loadBookings();
+    setRefreshing(false);
   };
 
   const handleSessionPress = (booking: Booking) => {
@@ -58,6 +64,10 @@ export default function SessionsScreen() {
         booking.focus,
         `Completed with ${host.name}\n${booking.day} @ ${booking.time}`,
         [
+          {
+            text: 'Leave Review',
+            onPress: () => navigation.navigate('LeaveReview', { hostId: host.id, bookingId: booking.id }),
+          },
           {
             text: 'Book Again',
             onPress: () => navigation.navigate('HostProfile', { hostId: host.id }),
@@ -105,6 +115,9 @@ export default function SessionsScreen() {
         )}
         contentContainerStyle={styles.list}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Colors.accent} />
+        }
         ListEmptyComponent={
           <View style={styles.empty}>
             <Text style={styles.emptyTitle}>
