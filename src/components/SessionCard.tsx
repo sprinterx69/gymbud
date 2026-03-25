@@ -1,13 +1,18 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Colors, Spacing, Radius, Font } from '../constants/theme';
+import { Booking } from '../types';
 import { MOCK_HOSTS } from '../constants/mockData';
 
-export default function SessionCard({ booking, onPress }) {
+interface SessionCardProps {
+  booking: Booking;
+  onPress: () => void;
+}
+
+export default function SessionCard({ booking, onPress }: SessionCardProps) {
   const host = MOCK_HOSTS.find((h) => h.id === booking.hostId);
   if (!host) return null;
 
-  const isUpcoming = booking.status === 'confirmed';
   const isPast = booking.status === 'completed';
 
   return (
@@ -16,24 +21,21 @@ export default function SessionCard({ booking, onPress }) {
       onPress={onPress}
       activeOpacity={0.7}
     >
-      {/* Date strip */}
       <View style={[styles.dateStrip, isPast && styles.dateStripPast]}>
         <Text style={styles.dateDay}>{booking.day.substring(0, 3).toUpperCase()}</Text>
         <Text style={styles.dateNum}>{booking.date.split('-')[2]}</Text>
       </View>
 
-      {/* Content */}
       <View style={styles.content}>
         <Text style={styles.focus}>{booking.focus}</Text>
         <Text style={styles.host}>with {host.name}</Text>
         <View style={styles.metaRow}>
           <Text style={styles.meta}>{booking.time}</Text>
-          <Text style={styles.metaDot}>·</Text>
+          <Text style={styles.metaDot}>{'\u00B7'}</Text>
           <Text style={styles.meta}>{host.gym.name}</Text>
         </View>
       </View>
 
-      {/* Status */}
       <View style={[styles.statusBadge, isPast ? styles.statusPast : styles.statusUpcoming]}>
         <Text style={[styles.statusText, isPast ? styles.statusTextPast : styles.statusTextUpcoming]}>
           {isPast ? 'Done' : 'Upcoming'}

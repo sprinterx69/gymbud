@@ -5,8 +5,8 @@ import { View, Text, StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { Colors, Font } from '../constants/theme';
 import { hasOnboarded } from '../services/storageService';
+import { RootStackParamList, MainTabParamList } from '../types';
 
-// Screens
 import WelcomeScreen from '../screens/WelcomeScreen';
 import RoleSelectScreen from '../screens/RoleSelectScreen';
 import ProfileSetupScreen from '../screens/ProfileSetupScreen';
@@ -15,21 +15,15 @@ import HostProfileScreen from '../screens/HostProfileScreen';
 import SessionsScreen from '../screens/SessionsScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 
-const Stack = createNativeStackNavigator();
-const Tab = createBottomTabNavigator();
+const Stack = createNativeStackNavigator<RootStackParamList>();
+const Tab = createBottomTabNavigator<MainTabParamList>();
 
-function TabIcon({ label, focused }) {
-  const icons = {
-    Browse: '&#128269;',
-    Sessions: '&#128197;',
-    Profile: '&#128100;',
-  };
+function TabIcon({ label, focused }: { label: string; focused: boolean }) {
+  const icon = label === 'Browse' ? '\uD83D\uDD0D' : label === 'Sessions' ? '\uD83D\uDCC5' : '\uD83D\uDC64';
 
   return (
     <View style={styles.tabItem}>
-      <Text style={[styles.tabIcon, focused && styles.tabIconActive]}>
-        {label === 'Browse' ? '\uD83D\uDD0D' : label === 'Sessions' ? '\uD83D\uDCC5' : '\uD83D\uDC64'}
-      </Text>
+      <Text style={[styles.tabIcon, focused && styles.tabIconActive]}>{icon}</Text>
       <Text style={[styles.tabLabel, focused && styles.tabLabelActive]}>{label}</Text>
     </View>
   );

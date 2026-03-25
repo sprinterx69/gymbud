@@ -1,19 +1,23 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Colors, Spacing, Radius, Font } from '../constants/theme';
+import { Host } from '../types';
 
-export default function HostCard({ host, onPress }) {
+interface HostCardProps {
+  host: Host;
+  onPress: () => void;
+}
+
+export default function HostCard({ host, onPress }: HostCardProps) {
   const nextSession = host.schedule.find((s) => s.time !== 'Rest');
 
   return (
     <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.7}>
       <View style={styles.row}>
-        {/* Avatar */}
         <View style={styles.avatar}>
           <Text style={styles.avatarText}>{host.initials}</Text>
         </View>
 
-        {/* Info */}
         <View style={styles.info}>
           <View style={styles.nameRow}>
             <Text style={styles.name}>{host.name}</Text>
@@ -27,14 +31,12 @@ export default function HostCard({ host, onPress }) {
           <Text style={styles.gym}>{host.gym.name}</Text>
         </View>
 
-        {/* Price */}
         <View style={styles.priceBox}>
           <Text style={styles.price}>${host.pricePerSession}</Text>
           <Text style={styles.priceLabel}>/session</Text>
         </View>
       </View>
 
-      {/* Tags */}
       <View style={styles.tags}>
         {host.tags.slice(0, 3).map((tag) => (
           <View key={tag} style={styles.tag}>
@@ -43,10 +45,9 @@ export default function HostCard({ host, onPress }) {
         ))}
       </View>
 
-      {/* Bottom row: rating + next session */}
       <View style={styles.bottomRow}>
         <View style={styles.ratingRow}>
-          <Text style={styles.star}>&#9733;</Text>
+          <Text style={styles.star}>{'\u2605'}</Text>
           <Text style={styles.ratingText}>{host.rating}</Text>
           <Text style={styles.reviewCount}>({host.reviewCount})</Text>
         </View>

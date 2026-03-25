@@ -8,22 +8,45 @@ import {
   Alert,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Colors, Spacing, Radius, Font } from '../constants/theme';
 import { MOCK_HOSTS, MOCK_REVIEWS } from '../constants/mockData';
 import { saveBooking } from '../services/storageService';
+import { RootStackParamList, ScheduleEntry } from '../types';
 import ReviewCard from '../components/ReviewCard';
 
-export default function HostProfileScreen({ route, navigation }) {
+type Props = NativeStackScreenProps<RootStackParamList, 'HostProfile'>;
+
+function getWorkoutDaysCount(schedule: ScheduleEntry[]): number {
+  return schedule.filter((s) => s.time !== 'Rest').length;
+}
+
+function getNextDate(dayName: string): string {
+  const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const today = new Date();
+  const todayIndex = today.getDay();
+  const targetIndex = days.indexOf(dayName);
+  let diff = targetIndex - todayIndex;
+  if (diff <= 0) diff += 7;
+  const next = new Date(today);
+  next.setDate(today.getDate() + diff);
+  return next.toISOString().split('T')[0];
+}
+
+export default function HostProfileScreen({ route, navigation }: Props) {
   const insets = useSafeAreaInsets();
   const { hostId } = route.params;
   const host = MOCK_HOSTS.find((h) => h.id === hostId);
   const reviews = MOCK_REVIEWS[hostId] || [];
-  const [selectedDay, setSelectedDay] = useState(null);
+  const [selectedDay, setSelectedDay] = useState<ScheduleEntry | null>(null);
 
   if (!host) return null;
 
+  const workoutDays = getWorkoutDaysCount(host.schedule);
+  const weeklySavings = host.pricePerSession * workoutDays - host.weeklyPrice;
+
   const handleBook = async () => {
-    if (!selectedDay) {
+    if (!selectedDay || !selectedDay.focus) {
       Alert.alert('Select a day', 'Tap a workout day to book that session.');
       return;
     }
@@ -35,7 +58,7 @@ export default function HostProfileScreen({ route, navigation }) {
       day: selectedDay.day,
       time: selectedDay.time,
       focus: selectedDay.focus,
-      status: 'confirmed',
+      status: 'confirmed' as const,
       price: host.pricePerSession,
     };
 
@@ -43,8 +66,13 @@ export default function HostProfileScreen({ route, navigation }) {
     Alert.alert(
       'Session Booked!',
       `${selectedDay.focus} with ${host.name}\n${selectedDay.day} @ ${selectedDay.time}`,
-      [{ text: 'View My Sessions', onPress: () => navigation.navigate('Sessions') },
-       { text: 'OK' }]
+      [
+        {
+          text: 'View My Sessions',
+          onPress: () => navigation.navigate('MainTabs', { screen: 'Sessions' }),
+        },
+        { text: 'OK' },
+      ],
     );
     setSelectedDay(null);
   };
@@ -52,12 +80,10 @@ export default function HostProfileScreen({ route, navigation }) {
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
-        {/* Back button */}
         <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
-          <Text style={styles.backText}>&#8592; Back</Text>
+          <Text style={styles.backText}>{'\u2190'} Back</Text>
         </TouchableOpacity>
 
-        {/* Header */}
         <View style={styles.profileHeader}>
           <View style={styles.avatar}>
             <Text style={styles.avatarText}>{host.initials}</Text>
@@ -72,12 +98,11 @@ export default function HostProfileScreen({ route, navigation }) {
               )}
             </View>
             <Text style={styles.meta}>
-              {host.age} · {host.experience} experience · {host.sessionsHosted} sessions
+              {host.age} {'\u00B7'} {host.experience} experience {'\u00B7'} {host.sessionsHosted} sessions
             </Text>
           </View>
         </View>
 
-        {/* Workout type + gym */}
         <View style={styles.infoRow}>
           <View style={styles.infoPill}>
             <Text style={styles.infoPillText}>{host.workoutType}</Text>
@@ -85,10 +110,8 @@ export default function HostProfileScreen({ route, navigation }) {
           <Text style={styles.gymName}>{host.gym.name}, {host.gym.city}</Text>
         </View>
 
-        {/* Bio */}
         <Text style={styles.bio}>{host.bio}</Text>
 
-        {/* Tags */}
         <View style={styles.tags}>
           {host.tags.map((tag) => (
             <View key={tag} style={styles.tag}>
@@ -97,7 +120,6 @@ export default function HostProfileScreen({ route, navigation }) {
           ))}
         </View>
 
-        {/* Pricing */}
         <View style={styles.pricingRow}>
           <View style={styles.priceCard}>
             <Text style={styles.priceAmount}>${host.pricePerSession}</Text>
@@ -105,14 +127,13 @@ export default function HostProfileScreen({ route, navigation }) {
           </View>
           <View style={[styles.priceCard, styles.priceCardWeekly]}>
             <Text style={[styles.priceAmount, styles.priceAmountWeekly]}>${host.weeklyPrice}</Text>
-            <Text style={[styles.priceLabel, styles.priceLabelWeekly]}>per week</Text>
-            <Text style={styles.savings}>
-              Save ${(host.pricePerSession * 5 - host.weeklyPrice)}
-            </Text>
+            <Text style={[styles.priceLabel, styles.priceLabelWeekly]}>per week ({workoutDays} days)</Text>
+            {weeklySavings > 0 && (
+              <Text style={styles.savings}>Save ${weeklySavings}</Text>
+            )}
           </View>
         </View>
 
-        {/* Schedule */}
         <Text style={styles.sectionTitle}>Weekly Schedule</Text>
         <Text style={styles.sectionSubtitle}>Tap a day to book</Text>
         <View style={styles.schedule}>
@@ -151,11 +172,10 @@ export default function HostProfileScreen({ route, navigation }) {
           })}
         </View>
 
-        {/* Reviews */}
         <View style={styles.reviewHeader}>
           <Text style={styles.sectionTitle}>Reviews</Text>
           <View style={styles.ratingBadge}>
-            <Text style={styles.ratingText}>&#9733; {host.rating}</Text>
+            <Text style={styles.ratingText}>{'\u2605'} {host.rating}</Text>
             <Text style={styles.reviewCount}>({host.reviewCount})</Text>
           </View>
         </View>
@@ -166,7 +186,6 @@ export default function HostProfileScreen({ route, navigation }) {
         )}
       </ScrollView>
 
-      {/* Bottom booking bar */}
       <View style={[styles.bookingBar, { paddingBottom: insets.bottom + 16 }]}>
         <View style={styles.bookingPrice}>
           <Text style={styles.bookingPriceText}>${host.pricePerSession}</Text>
@@ -184,19 +203,6 @@ export default function HostProfileScreen({ route, navigation }) {
       </View>
     </View>
   );
-}
-
-// Helper to get next occurrence of a weekday
-function getNextDate(dayName) {
-  const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-  const today = new Date();
-  const todayIndex = today.getDay();
-  const targetIndex = days.indexOf(dayName);
-  let diff = targetIndex - todayIndex;
-  if (diff <= 0) diff += 7;
-  const next = new Date(today);
-  next.setDate(today.getDate() + diff);
-  return next.toISOString().split('T')[0];
 }
 
 const styles = StyleSheet.create({
@@ -432,7 +438,6 @@ const styles = StyleSheet.create({
     color: Colors.textMuted,
     fontStyle: 'italic',
   },
-  // Booking bar
   bookingBar: {
     position: 'absolute',
     bottom: 0,

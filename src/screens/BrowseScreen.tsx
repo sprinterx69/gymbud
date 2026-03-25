@@ -9,13 +9,17 @@ import {
   ScrollView,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Colors, Spacing, Radius, Font } from '../constants/theme';
 import { MOCK_HOSTS, WORKOUT_TYPES } from '../constants/mockData';
+import { RootStackParamList } from '../types';
 import HostCard from '../components/HostCard';
 
 const FILTER_OPTIONS = ['All', ...WORKOUT_TYPES.slice(0, 6)];
 
-export default function BrowseScreen({ navigation }) {
+export default function BrowseScreen() {
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const insets = useSafeAreaInsets();
   const [search, setSearch] = useState('');
   const [activeFilter, setActiveFilter] = useState('All');
@@ -28,7 +32,7 @@ export default function BrowseScreen({ navigation }) {
         (h) =>
           h.name.toLowerCase().includes(q) ||
           h.workoutType.toLowerCase().includes(q) ||
-          h.gym.name.toLowerCase().includes(q)
+          h.gym.name.toLowerCase().includes(q),
       );
     }
     if (activeFilter !== 'All') {
@@ -39,7 +43,6 @@ export default function BrowseScreen({ navigation }) {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
-      {/* Header */}
       <View style={styles.header}>
         <Text style={styles.title}>Find Your{'\n'}Gym Partner</Text>
         <TextInput
@@ -51,7 +54,6 @@ export default function BrowseScreen({ navigation }) {
         />
       </View>
 
-      {/* Filter chips */}
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -70,7 +72,6 @@ export default function BrowseScreen({ navigation }) {
         ))}
       </ScrollView>
 
-      {/* Host list */}
       <FlatList
         data={filtered}
         keyExtractor={(item) => item.id}

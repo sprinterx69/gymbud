@@ -1,14 +1,17 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Colors, Spacing, Radius, Font } from '../constants/theme';
+import { RootStackParamList } from '../types';
 
-export default function WelcomeScreen({ navigation }) {
+type Props = NativeStackScreenProps<RootStackParamList, 'Welcome'>;
+
+export default function WelcomeScreen({ navigation }: Props) {
   return (
     <View style={styles.container}>
-      {/* Hero */}
       <View style={styles.hero}>
         <View style={styles.iconCircle}>
-          <Text style={styles.icon}>&#128170;</Text>
+          <Text style={styles.icon}>{'\uD83D\uDCAA'}</Text>
         </View>
         <Text style={styles.title}>GymBud</Text>
         <Text style={styles.subtitle}>
@@ -16,7 +19,6 @@ export default function WelcomeScreen({ navigation }) {
         </Text>
       </View>
 
-      {/* Value props */}
       <View style={styles.props}>
         <View style={styles.propRow}>
           <View style={styles.propDot} />
@@ -32,7 +34,6 @@ export default function WelcomeScreen({ navigation }) {
         </View>
       </View>
 
-      {/* CTA */}
       <View style={styles.bottom}>
         <TouchableOpacity
           style={styles.primaryBtn}
