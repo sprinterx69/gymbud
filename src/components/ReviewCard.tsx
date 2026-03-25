@@ -1,8 +1,13 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Colors, Spacing, Radius, Font } from '../constants/theme';
+import { Review } from '../types';
 
-export default function ReviewCard({ review }) {
+interface ReviewCardProps {
+  review: Review;
+}
+
+export default function ReviewCard({ review }: ReviewCardProps) {
   const stars = Array.from({ length: 5 }, (_, i) => i < review.rating);
 
   return (
@@ -12,7 +17,7 @@ export default function ReviewCard({ review }) {
         <View style={styles.stars}>
           {stars.map((filled, i) => (
             <Text key={i} style={[styles.star, !filled && styles.starEmpty]}>
-              &#9733;
+              {'\u2605'}
             </Text>
           ))}
         </View>

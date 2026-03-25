@@ -1,28 +1,71 @@
 import React, { useState, useCallback } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Colors, Spacing, Radius, Font } from '../constants/theme';
-import { getBookings } from '../services/storageService';
-import { MOCK_BOOKINGS } from '../constants/mockData';
+import { getBookings, updateBookingStatus } from '../services/storageService';
+import { MOCK_BOOKINGS, MOCK_HOSTS } from '../constants/mockData';
+import { Booking, RootStackParamList } from '../types';
 import SessionCard from '../components/SessionCard';
 
-export default function SessionsScreen({ navigation }) {
+export default function SessionsScreen() {
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const insets = useSafeAreaInsets();
-  const [bookings, setBookings] = useState([]);
-  const [tab, setTab] = useState('upcoming');
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [tab, setTab] = useState<'upcoming' | 'past'>('upcoming');
 
   useFocusEffect(
     useCallback(() => {
       loadBookings();
-    }, [])
+    }, []),
   );
 
   const loadBookings = async () => {
     const saved = await getBookings();
-    // Merge with demo data if no saved bookings
-    const all = saved.length > 0 ? saved : MOCK_BOOKINGS;
-    setBookings(all);
+    // Merge saved bookings with demo data, avoiding duplicates by id
+    const savedIds = new Set(saved.map((b) => b.id));
+    const demo = MOCK_BOOKINGS.filter((b) => !savedIds.has(b.id));
+    setBookings([...saved, ...demo]);
+  };
+
+  const handleSessionPress = (booking: Booking) => {
+    const host = MOCK_HOSTS.find((h) => h.id === booking.hostId);
+    if (!host) return;
+
+    if (booking.status === 'confirmed') {
+      Alert.alert(
+        booking.focus,
+        `With ${host.name}\n${booking.day} @ ${booking.time}\n${host.gym.name}`,
+        [
+          {
+            text: 'Cancel Session',
+            style: 'destructive',
+            onPress: async () => {
+              await updateBookingStatus(booking.id, 'cancelled');
+              loadBookings();
+            },
+          },
+          {
+            text: 'View Host',
+            onPress: () => navigation.navigate('HostProfile', { hostId: host.id }),
+          },
+          { text: 'Close' },
+        ],
+      );
+    } else {
+      Alert.alert(
+        booking.focus,
+        `Completed with ${host.name}\n${booking.day} @ ${booking.time}`,
+        [
+          {
+            text: 'Book Again',
+            onPress: () => navigation.navigate('HostProfile', { hostId: host.id }),
+          },
+          { text: 'Close' },
+        ],
+      );
+    }
   };
 
   const upcoming = bookings.filter((b) => b.status === 'confirmed');
@@ -35,7 +78,6 @@ export default function SessionsScreen({ navigation }) {
         <Text style={styles.title}>My Sessions</Text>
       </View>
 
-      {/* Tabs */}
       <View style={styles.tabs}>
         <TouchableOpacity
           style={[styles.tab, tab === 'upcoming' && styles.tabActive]}
@@ -59,7 +101,7 @@ export default function SessionsScreen({ navigation }) {
         data={shown}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <SessionCard booking={item} onPress={() => {}} />
+          <SessionCard booking={item} onPress={() => handleSessionPress(item)} />
         )}
         contentContainerStyle={styles.list}
         showsVerticalScrollIndicator={false}
@@ -76,7 +118,7 @@ export default function SessionsScreen({ navigation }) {
             {tab === 'upcoming' && (
               <TouchableOpacity
                 style={styles.browseBtn}
-                onPress={() => navigation.navigate('Browse')}
+                onPress={() => navigation.navigate('Browse' as never)}
               >
                 <Text style={styles.browseBtnText}>Find a Gym Partner</Text>
               </TouchableOpacity>

@@ -1,9 +1,13 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Colors, Spacing, Radius, Font } from '../constants/theme';
+import { RootStackParamList } from '../types';
 
-export default function RoleSelectScreen({ navigation }) {
-  const handleSelect = (role) => {
+type Props = NativeStackScreenProps<RootStackParamList, 'RoleSelect'>;
+
+export default function RoleSelectScreen({ navigation }: Props) {
+  const handleSelect = (role: 'client' | 'host') => {
     navigation.navigate('ProfileSetup', { role });
   };
 
@@ -13,13 +17,12 @@ export default function RoleSelectScreen({ navigation }) {
       <Text style={styles.subtitle}>You can always switch later</Text>
 
       <View style={styles.cards}>
-        {/* Client card */}
         <TouchableOpacity
           style={styles.card}
           onPress={() => handleSelect('client')}
           activeOpacity={0.7}
         >
-          <Text style={styles.cardEmoji}>&#127939;</Text>
+          <Text style={styles.cardEmoji}>{'\uD83C\uDFC3'}</Text>
           <Text style={styles.cardTitle}>Join Workouts</Text>
           <Text style={styles.cardDesc}>
             Find dedicated gym-goers and follow their routine. Like working out with a knowledgeable friend.
@@ -29,13 +32,12 @@ export default function RoleSelectScreen({ navigation }) {
           </View>
         </TouchableOpacity>
 
-        {/* Host card */}
         <TouchableOpacity
           style={[styles.card, styles.cardHost]}
           onPress={() => handleSelect('host')}
           activeOpacity={0.7}
         >
-          <Text style={styles.cardEmoji}>&#128176;</Text>
+          <Text style={styles.cardEmoji}>{'\uD83D\uDCB0'}</Text>
           <Text style={styles.cardTitle}>Host Workouts</Text>
           <Text style={styles.cardDesc}>
             You already work out consistently. Let others join your sessions and earn money doing what you love.

@@ -8,23 +8,30 @@ import {
   Alert,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Colors, Spacing, Radius, Font } from '../constants/theme';
 import { getUserProfile, clearAll } from '../services/storageService';
+import { UserProfile, RootStackParamList } from '../types';
 
-export default function ProfileScreen({ navigation }) {
+export default function ProfileScreen() {
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const insets = useSafeAreaInsets();
-  const [profile, setProfile] = useState(null);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
 
   useFocusEffect(
     useCallback(() => {
       loadProfile();
-    }, [])
+    }, []),
   );
 
   const loadProfile = async () => {
     const p = await getUserProfile();
     setProfile(p);
+  };
+
+  const handleSettingPress = (setting: string) => {
+    Alert.alert('Coming Soon', `${setting} will be available in a future update.`);
   };
 
   const handleLogout = () => {
@@ -48,7 +55,6 @@ export default function ProfileScreen({ navigation }) {
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-        {/* Profile header */}
         <View style={styles.profileCard}>
           <View style={styles.avatar}>
             <Text style={styles.avatarText}>{profile.initials}</Text>
@@ -59,7 +65,6 @@ export default function ProfileScreen({ navigation }) {
           </View>
         </View>
 
-        {/* Info cards */}
         <View style={styles.infoGrid}>
           <View style={styles.infoCard}>
             <Text style={styles.infoValue}>{profile.age}</Text>
@@ -75,41 +80,38 @@ export default function ProfileScreen({ navigation }) {
           </View>
         </View>
 
-        {/* Settings */}
         <Text style={styles.sectionTitle}>Settings</Text>
 
         <View style={styles.settingsGroup}>
-          <TouchableOpacity style={styles.settingRow}>
+          <TouchableOpacity style={styles.settingRow} onPress={() => handleSettingPress('Edit Profile')}>
             <Text style={styles.settingText}>Edit Profile</Text>
-            <Text style={styles.settingArrow}>&#8250;</Text>
+            <Text style={styles.settingArrow}>{'\u203A'}</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.settingRow}>
+          <TouchableOpacity style={styles.settingRow} onPress={() => handleSettingPress('Notifications')}>
             <Text style={styles.settingText}>Notifications</Text>
-            <Text style={styles.settingArrow}>&#8250;</Text>
+            <Text style={styles.settingArrow}>{'\u203A'}</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.settingRow}>
+          <TouchableOpacity style={styles.settingRow} onPress={() => handleSettingPress('Payment Methods')}>
             <Text style={styles.settingText}>Payment Methods</Text>
-            <Text style={styles.settingArrow}>&#8250;</Text>
+            <Text style={styles.settingArrow}>{'\u203A'}</Text>
           </TouchableOpacity>
           {isHost && (
-            <TouchableOpacity style={styles.settingRow}>
+            <TouchableOpacity style={styles.settingRow} onPress={() => handleSettingPress('Payout Settings')}>
               <Text style={styles.settingText}>Payout Settings</Text>
-              <Text style={styles.settingArrow}>&#8250;</Text>
+              <Text style={styles.settingArrow}>{'\u203A'}</Text>
             </TouchableOpacity>
           )}
-          <TouchableOpacity style={styles.settingRow}>
+          <TouchableOpacity style={styles.settingRow} onPress={() => handleSettingPress('Help & Support')}>
             <Text style={styles.settingText}>Help & Support</Text>
-            <Text style={styles.settingArrow}>&#8250;</Text>
+            <Text style={styles.settingArrow}>{'\u203A'}</Text>
           </TouchableOpacity>
         </View>
 
-        {/* App info */}
         <View style={styles.appInfo}>
           <Text style={styles.appName}>GymBud</Text>
           <Text style={styles.appVersion}>Version 1.0.0</Text>
         </View>
 
-        {/* Reset */}
         <TouchableOpacity style={styles.resetBtn} onPress={handleLogout}>
           <Text style={styles.resetText}>Reset App</Text>
         </TouchableOpacity>

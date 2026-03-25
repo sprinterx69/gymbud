@@ -8,26 +8,37 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
+  Alert,
 } from 'react-native';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Colors, Spacing, Radius, Font } from '../constants/theme';
 import { WORKOUT_TYPES, GYMS } from '../constants/mockData';
 import { saveUserProfile, setOnboarded } from '../services/storageService';
+import { RootStackParamList, Gym } from '../types';
 
-export default function ProfileSetupScreen({ route, navigation }) {
+type Props = NativeStackScreenProps<RootStackParamList, 'ProfileSetup'>;
+
+export default function ProfileSetupScreen({ route, navigation }: Props) {
   const { role } = route.params;
   const [name, setName] = useState('');
   const [age, setAge] = useState('');
-  const [selectedGym, setSelectedGym] = useState(null);
-  const [selectedWorkout, setSelectedWorkout] = useState(null);
+  const [selectedGym, setSelectedGym] = useState<Gym | null>(null);
+  const [selectedWorkout, setSelectedWorkout] = useState<string | null>(null);
   const [bio, setBio] = useState('');
 
   const isHost = role === 'host';
   const canContinue = name.trim() && age.trim() && selectedGym;
 
   const handleSave = async () => {
+    const parsedAge = parseInt(age, 10);
+    if (isNaN(parsedAge) || parsedAge < 16 || parsedAge > 99) {
+      Alert.alert('Invalid Age', 'Please enter a valid age between 16 and 99.');
+      return;
+    }
+
     const profile = {
       name: name.trim(),
-      age: parseInt(age, 10),
+      age: parsedAge,
       role,
       gym: selectedGym,
       workoutType: selectedWorkout,
@@ -51,7 +62,6 @@ export default function ProfileSetupScreen({ route, navigation }) {
           {isHost ? 'People will see this when browsing hosts' : 'Help us find the right gym partner for you'}
         </Text>
 
-        {/* Name */}
         <Text style={styles.label}>Your name</Text>
         <TextInput
           style={styles.input}
@@ -61,19 +71,17 @@ export default function ProfileSetupScreen({ route, navigation }) {
           placeholderTextColor={Colors.textMuted}
         />
 
-        {/* Age */}
         <Text style={styles.label}>Age</Text>
         <TextInput
           style={[styles.input, { width: 100 }]}
           value={age}
-          onChangeText={setAge}
+          onChangeText={(text) => setAge(text.replace(/[^0-9]/g, ''))}
           placeholder="25"
           placeholderTextColor={Colors.textMuted}
           keyboardType="number-pad"
           maxLength={2}
         />
 
-        {/* Gym */}
         <Text style={styles.label}>Your gym</Text>
         <View style={styles.chipGrid}>
           {GYMS.map((gym) => (
@@ -89,7 +97,6 @@ export default function ProfileSetupScreen({ route, navigation }) {
           ))}
         </View>
 
-        {/* Workout type (optional) */}
         <Text style={styles.label}>
           {isHost ? 'Your workout split' : 'Preferred workout style (optional)'}
         </Text>
@@ -107,7 +114,6 @@ export default function ProfileSetupScreen({ route, navigation }) {
           ))}
         </View>
 
-        {/* Bio (host only) */}
         {isHost && (
           <>
             <Text style={styles.label}>Bio</Text>
@@ -124,7 +130,6 @@ export default function ProfileSetupScreen({ route, navigation }) {
           </>
         )}
 
-        {/* Save */}
         <TouchableOpacity
           style={[styles.saveBtn, !canContinue && styles.saveBtnDisabled]}
           onPress={handleSave}

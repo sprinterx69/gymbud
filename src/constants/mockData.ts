@@ -1,6 +1,6 @@
-// Realistic mock data for GymBud MVP
+import { Gym, Host, Review, Booking } from '../types';
 
-export const WORKOUT_TYPES = [
+export const WORKOUT_TYPES: string[] = [
   'Push/Pull/Legs',
   'Upper/Lower',
   'Full Body',
@@ -13,16 +13,16 @@ export const WORKOUT_TYPES = [
   'HIIT',
 ];
 
-export const GYMS = [
+export const GYMS: Gym[] = [
   { id: 'g1', name: 'Anytime Fitness - Eagle Rd', city: 'Boise' },
   { id: 'g2', name: 'YMCA Downtown', city: 'Boise' },
   { id: 'g3', name: 'Club Apple Fitness', city: 'Meridian' },
   { id: 'g4', name: 'Crunch Fitness - Overland', city: 'Boise' },
-  { id: 'g5', name: 'Gold\'s Gym', city: 'Nampa' },
+  { id: 'g5', name: "Gold's Gym", city: 'Nampa' },
   { id: 'g6', name: 'Idaho Athletic Club', city: 'Eagle' },
 ];
 
-export const MOCK_HOSTS = [
+export const MOCK_HOSTS: Host[] = [
   {
     id: 'h1',
     name: 'Marcus Johnson',
@@ -85,7 +85,7 @@ export const MOCK_HOSTS = [
     age: 31,
     avatar: null,
     initials: 'DO',
-    bio: 'Powerlifter turned general strength. I keep it simple — big compound lifts, progressive overload, no BS. If you want fancy stuff, I\'m not your guy.',
+    bio: "Powerlifter turned general strength. I keep it simple — big compound lifts, progressive overload, no BS. If you want fancy stuff, I'm not your guy.",
     workoutType: 'Strength Training',
     gym: GYMS[1],
     experience: '9 years',
@@ -169,7 +169,7 @@ export const MOCK_HOSTS = [
     age: 29,
     avatar: null,
     initials: 'AR',
-    bio: 'Upper/Lower split, 4 days a week. I focus on progressive overload and tracking everything. I\'ll show you how to actually log your lifts.',
+    bio: "Upper/Lower split, 4 days a week. I focus on progressive overload and tracking everything. I'll show you how to actually log your lifts.",
     workoutType: 'Upper/Lower',
     gym: GYMS[5],
     experience: '7 years',
@@ -193,7 +193,7 @@ export const MOCK_HOSTS = [
   },
 ];
 
-export const MOCK_REVIEWS = {
+export const MOCK_REVIEWS: Record<string, Review[]> = {
   h1: [
     { id: 'r1', author: 'Tyler B.', rating: 5, text: 'Marcus is the real deal. First day he showed me proper bench form and I felt it way more. Great energy.', date: '2025-03-10' },
     { id: 'r2', author: 'Amir K.', rating: 5, text: 'Been going with him for 3 weeks now. Already seeing progress. Feels like working out with a friend not a trainer.', date: '2025-03-05' },
@@ -201,8 +201,8 @@ export const MOCK_REVIEWS = {
   ],
   h2: [
     { id: 'r4', author: 'Keisha M.', rating: 5, text: 'Sarah is amazing!! Her workouts are so well structured and she always has a plan. Plus the music is fire.', date: '2025-03-12' },
-    { id: 'r5', author: 'Lisa T.', rating: 5, text: 'Finally found someone who takes it as seriously as me. We push each other. Best investment I\'ve made.', date: '2025-03-08' },
-    { id: 'r6', author: 'Dee P.', rating: 5, text: 'I was nervous joining a stranger but Sarah made it feel so natural. Like we\'d been gym buddies for years.', date: '2025-03-01' },
+    { id: 'r5', author: 'Lisa T.', rating: 5, text: "Finally found someone who takes it as seriously as me. We push each other. Best investment I've made.", date: '2025-03-08' },
+    { id: 'r6', author: 'Dee P.', rating: 5, text: "I was nervous joining a stranger but Sarah made it feel so natural. Like we'd been gym buddies for years.", date: '2025-03-01' },
   ],
   h3: [
     { id: 'r7', author: 'Kellen S.', rating: 5, text: 'If you want strength, this is your guy. My squat went up 30lbs in a month just following his programming.', date: '2025-03-11' },
@@ -214,12 +214,12 @@ export const MOCK_REVIEWS = {
   ],
   h6: [
     { id: 'r11', author: 'Rachel F.', rating: 5, text: 'Ava taught me how to actually track my lifts and progress. Game changer. My strength has gone up consistently.', date: '2025-03-13' },
-    { id: 'r12', author: 'Sam J.', rating: 5, text: 'Most organized workout partner I\'ve ever had. She has everything planned out and we never waste time.', date: '2025-03-06' },
-    { id: 'r13', author: 'Tina M.', rating: 5, text: 'Worth every penny. I\'ve tried 3 personal trainers and Ava\'s approach actually works because you feel like equals.', date: '2025-02-28' },
+    { id: 'r12', author: 'Sam J.', rating: 5, text: "Most organized workout partner I've ever had. She has everything planned out and we never waste time.", date: '2025-03-06' },
+    { id: 'r13', author: 'Tina M.', rating: 5, text: "Worth every penny. I've tried 3 personal trainers and Ava's approach actually works because you feel like equals.", date: '2025-02-28' },
   ],
 };
 
-export const MOCK_BOOKINGS = [
+export const MOCK_BOOKINGS: Booking[] = [
   {
     id: 'b1',
     hostId: 'h1',
@@ -228,6 +228,7 @@ export const MOCK_BOOKINGS = [
     time: '6:00 AM',
     focus: 'Legs',
     status: 'confirmed',
+    price: 15,
   },
   {
     id: 'b2',
@@ -237,6 +238,7 @@ export const MOCK_BOOKINGS = [
     time: '6:00 AM',
     focus: 'Push (Chest/Shoulders/Triceps)',
     status: 'confirmed',
+    price: 15,
   },
   {
     id: 'b3',
@@ -246,5 +248,6 @@ export const MOCK_BOOKINGS = [
     time: '5:30 PM',
     focus: 'Glutes & Hamstrings',
     status: 'completed',
+    price: 20,
   },
 ];
