@@ -6,9 +6,11 @@ import { Host } from '../types';
 interface HostCardProps {
   host: Host;
   onPress: () => void;
+  isFavorite?: boolean;
+  onFavoriteToggle?: () => void;
 }
 
-export default function HostCard({ host, onPress }: HostCardProps) {
+export default function HostCard({ host, onPress, isFavorite, onFavoriteToggle }: HostCardProps) {
   const nextSession = host.schedule.find((s) => s.time !== 'Rest');
 
   return (
@@ -31,7 +33,14 @@ export default function HostCard({ host, onPress }: HostCardProps) {
           <Text style={styles.gym}>{host.gym.name}</Text>
         </View>
 
-        <View style={styles.priceBox}>
+        <View style={styles.priceCol}>
+          {onFavoriteToggle && (
+            <TouchableOpacity onPress={onFavoriteToggle} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+              <Text style={[styles.heart, isFavorite && styles.heartActive]}>
+                {isFavorite ? '\u2665' : '\u2661'}
+              </Text>
+            </TouchableOpacity>
+          )}
           <Text style={styles.price}>${host.pricePerSession}</Text>
           <Text style={styles.priceLabel}>/session</Text>
         </View>
@@ -123,8 +132,16 @@ const styles = StyleSheet.create({
     color: Colors.textMuted,
     marginTop: 2,
   },
-  priceBox: {
+  priceCol: {
     alignItems: 'flex-end',
+    gap: 2,
+  },
+  heart: {
+    fontSize: 20,
+    color: Colors.textMuted,
+  },
+  heartActive: {
+    color: Colors.danger,
   },
   price: {
     fontSize: Font.xl,

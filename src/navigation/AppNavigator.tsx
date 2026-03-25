@@ -5,7 +5,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { Colors, Font } from '../constants/theme';
 import { hasOnboarded } from '../services/storageService';
-import { RootStackParamList, MainTabParamList } from '../types';
+import { RootStackParamList } from '../types';
 
 import WelcomeScreen from '../screens/WelcomeScreen';
 import RoleSelectScreen from '../screens/RoleSelectScreen';
@@ -14,9 +14,13 @@ import BrowseScreen from '../screens/BrowseScreen';
 import HostProfileScreen from '../screens/HostProfileScreen';
 import SessionsScreen from '../screens/SessionsScreen';
 import ProfileScreen from '../screens/ProfileScreen';
+import EditProfileScreen from '../screens/EditProfileScreen';
+import NotificationSettingsScreen from '../screens/NotificationSettingsScreen';
+import HelpSupportScreen from '../screens/HelpSupportScreen';
+import LeaveReviewScreen from '../screens/LeaveReviewScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
-const Tab = createBottomTabNavigator<MainTabParamList>();
+const Tab = createBottomTabNavigator();
 
 function TabIcon({ label, focused }: { label: string; focused: boolean }) {
   const icon = label === 'Browse' ? '\uD83D\uDD0D' : label === 'Sessions' ? '\uD83D\uDCC5' : '\uD83D\uDC64';
@@ -96,6 +100,10 @@ export default function AppNavigator() {
         <Stack.Screen name="ProfileSetup" component={ProfileSetupScreen} />
         <Stack.Screen name="MainTabs" component={MainTabs} />
         <Stack.Screen name="HostProfile" component={HostProfileScreen} />
+        <Stack.Screen name="EditProfile" component={EditProfileScreen} />
+        <Stack.Screen name="NotificationSettings" component={NotificationSettingsScreen} />
+        <Stack.Screen name="HelpSupport" component={HelpSupportScreen} />
+        <Stack.Screen name="LeaveReview" component={LeaveReviewScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
