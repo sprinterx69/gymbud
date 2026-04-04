@@ -72,13 +72,20 @@ export default function AppNavigator() {
   const [onboarded, setOnboarded] = useState(false);
 
   useEffect(() => {
-    checkOnboarding();
+    // Timeout ensures we never hang on the loading screen
+    const timeout = setTimeout(() => setLoading(false), 3000);
+    checkOnboarding().finally(() => clearTimeout(timeout));
   }, []);
 
   const checkOnboarding = async () => {
-    const done = await hasOnboarded();
-    setOnboarded(done);
-    setLoading(false);
+    try {
+      const done = await hasOnboarded();
+      setOnboarded(done);
+    } catch {
+      // If storage fails, treat as not onboarded
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (loading) {
