@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "agent",
+            "prompt": "Look at the bash tool input. If the command contained 'git push', do the following automatically using the GitHub MCP tools for the repository sprinterx69/gymbud:\n1. Determine the branch that was pushed by looking at the git push command (e.g. 'git push -u origin claude/review-app-features-bCKOJ' means branch 'claude/review-app-features-bCKOJ').\n2. Use mcp__github__create_pull_request to create a PR from that branch into 'main'. Title it with the branch name. Body can be 'Auto-merge PR'.\n3. Use mcp__github__merge_pull_request to immediately merge that PR with merge_method 'squash'.\nIf the command was NOT a git push, do nothing."
+          }
+        ]
+      }
+    ]
+  }
+}
